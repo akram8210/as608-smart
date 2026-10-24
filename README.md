@@ -1,21 +1,26 @@
-# AS608 Smart Fingerprint v1.0 — source release (not hardware-verified)
+# AS608 Smart v1.1 — classroom test build
 
-## Capabilities
-- Swedish/English MakeCode block labels, original enrollment/search/delete blocks retained.
-- Full-frame UART timeout, ACK address/length/checksum verification.
-- Automatic polling and recognized/rejected/communication-error event handlers.
-- Last fingerprint ID, counts, configurable rejected-attempt lockout.
-- Standard MakeCode LED, sound, servo, motor-driver, relay blocks can be placed inside events. No unsafe direct motor-driving block is provided.
+MakeCode Blocks extension for BBC micro:bit V2 and AS608 fingerprint scanner. English and Swedish labels.
 
-## Important limitations
-- **Not compiled against the MakeCode toolchain and not tested with physical AS608**; this is a source-level implementation, not a certified working extension.
-- Avoid calling other fingerprint blocks while automatic scanning is running: the original API is not globally serialized. Stop automatic scanning before enrollment, deletion or manual searches.
-- Timeout does not reset an electrically frozen sensor. An AS608 running at 3.3 V must be checked against the exact module voltage/current requirements and breakout power rails.
-- Rejection events are debounced until a no-finger scan occurs. A failed scan can be a poor image, not an unauthorized user.
-- This is a classroom prototype, not a security-rated door lock. Do not use for actual access control without hardware validation.
+## Changes since v1.0
+- No finger (`0x02`) is different from poor image (`-5`), no match (`-9`), and UART failure (`-2`). Only confirmed `-9` fires the rejected event.
+- Automatic events run on independent fibers so `play tone ... until done` does not hold up polling.
+- Two consecutive no-finger readings are required before another placement can trigger an event.
+- Lockout is **disabled by default**; teachers can explicitly configure it in advanced blocks.
+- Stop/restart of background scanning invalidates the previous loop.
+- Existing bounded UART frame receiver retained.
 
-## Block test
-On start: connect scanner RX P13, TX P14, do nothing; then register on recognized (show check), on rejected (show X), on communication error (show sad face); then start automatic fingerprint scanning. Connect an LED/buzzer/servo through the corresponding standard MakeCode blocks in each handler after verifying external wiring and motor power.
+## Test (Blocks)
+1. `on start`: Connect scanner RX to P13, TX to P14, **do nothing**; pause 2000 ms; start automatic fingerprint scanning.
+2. `on fingerprint recognized`: show check icon; play tone 262 Hz for 1 beat.
+3. `on fingerprint rejected`: show X icon; play tone 131 Hz for 1/2 beat.
+4. `on scanner communication error`: show a distinct symbol or count errors (avoid long animations).
+5. Test registered and unregistered fingers, remove finger between trials, and test with no finger for 5 minutes.
 
-## Installation
-Unzip files to a public GitHub repository and add it through MakeCode Extensions using the repository URL. The ZIP itself is source code and is not a .hex firmware.
+Do not run manual Scan finger or enrollment concurrently with automatic scanning. Stop automatic scanning before using manual commands. No motor should be connected for initial verification.
+
+## Updating GitHub
+Replace `main.ts`, `pxt.json`, `README.md` and `_locales` in your repository. In MakeCode remove and re-add the extension or create a new test project if the previous code is cached.
+
+## Status
+Source-level changes only. Not compiled with the MakeCode compiler or hardware-tested here. A successful result on your physical AS608 and micro:bit V2 is required before classroom deployment. This is an educational prototype, not a security-rated lock.
