@@ -1,0 +1,14 @@
+{
+  "name": "as608-smart-fingerprint",
+  "version": "1.0.0",
+  "description": "AS608 fingerprint blocks, bounded UART parsing, automatic recognition and events for micro:bit V2",
+  "dependencies": {
+    "core": "*"
+  },
+  "files": [
+    "main.ts",
+    "_locales/sv.json",
+    "_locales/en.json"
+  ],
+  "public": true
+}

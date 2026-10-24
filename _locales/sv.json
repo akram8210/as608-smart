@@ -1,0 +1,22 @@
+{
+  "FingerprintAS608": "Fingeravtryck",
+  "FingerprintAS608.init|block": "Anslut läsare RX till $txpin, TX till $rxpin|| och $doCommands",
+  "FingerprintAS608.genImg|block": "Läs av finger",
+  "FingerprintAS608.identifyOnce|block": "Identifiera finger en gång",
+  "FingerprintAS608.scannerResponded|block": "Läsaren svarade",
+  "FingerprintAS608.search|block": "Sök matchning för fingerdata i $slot",
+  "FingerprintAS608.img2Tz|block": "Skapa fingerdata i $slot",
+  "FingerprintAS608.getTemplateCount|block": "Antal sparade fingeravtryck",
+  "FingerprintAS608.startAutomatic|block": "starta automatisk fingeravtrycksläsning",
+  "FingerprintAS608.stopAutomatic|block": "stoppa automatisk fingeravtrycksläsning",
+  "FingerprintAS608.onRecognized|block": "när fingeravtryck känns igen",
+  "FingerprintAS608.onRejected|block": "när fingeravtryck nekas",
+  "FingerprintAS608.onCommunicationError|block": "vid kommunikationsfel med läsaren",
+  "FingerprintAS608.lastID|block": "senaste fingeravtrycks-ID",
+  "FingerprintAS608.configureLock|block": "lås efter $attempts nekade försök i $seconds sekunder",
+  "FingerprintAS608.isLockedOut|block": "fingeravtrycksläsaren är låst",
+  "FingerprintAS608.lastError|block": "senaste kommunikationsfelkod",
+  "FingerprintAS608.recognizedCount|block": "antal godkända fingeravtryck",
+  "FingerprintAS608.failedCount|block": "antal nekade eller misslyckade läsningar",
+  "FingerprintAS608.resetStatistics|block": "nollställ fingeravtrycksstatistik"
+}

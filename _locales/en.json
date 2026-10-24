@@ -1,0 +1,22 @@
+{
+  "FingerprintAS608": "Fingerprint",
+  "FingerprintAS608.init|block": "Connect scanner RX to $txpin, TX to $rxpin|| and $doCommands",
+  "FingerprintAS608.genImg|block": "Scan finger",
+  "FingerprintAS608.identifyOnce|block": "Identify finger once",
+  "FingerprintAS608.scannerResponded|block": "Scanner responded",
+  "FingerprintAS608.search|block": "Search for match for characteristic in $slot",
+  "FingerprintAS608.img2Tz|block": "Generate characteristic in $slot",
+  "FingerprintAS608.getTemplateCount|block": "Stored template count",
+  "FingerprintAS608.startAutomatic|block": "start automatic fingerprint scanning",
+  "FingerprintAS608.stopAutomatic|block": "stop automatic fingerprint scanning",
+  "FingerprintAS608.onRecognized|block": "on fingerprint recognized",
+  "FingerprintAS608.onRejected|block": "on fingerprint rejected",
+  "FingerprintAS608.onCommunicationError|block": "on scanner communication error",
+  "FingerprintAS608.lastID|block": "last fingerprint ID",
+  "FingerprintAS608.configureLock|block": "security lock after $attempts rejected attempts for $seconds seconds",
+  "FingerprintAS608.isLockedOut|block": "fingerprint scanner locked out",
+  "FingerprintAS608.lastError|block": "last communication error code",
+  "FingerprintAS608.recognizedCount|block": "recognized fingerprints count",
+  "FingerprintAS608.failedCount|block": "rejected or failed scans count",
+  "FingerprintAS608.resetStatistics|block": "reset fingerprint statistics"
+}
