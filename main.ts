@@ -131,11 +131,13 @@ namespace FingerprintAS608 {
     let lastFingerId = -1
     let consecutiveRejects = 0
     let lockedUntil = 0
-    let maxRejects = 3
+    let maxRejects = 0 // opt-in: never lock students out by default
     let lockDuration = 10000
     let pollBusy = false
     let autoRunning = false
     let waitForRemoval = false
+    let noFingerStreak = 0
+    let autoGeneration = 0
     let recognizedHandler: (id: number) => void = null
     let rejectedHandler: () => void = null
     let errorHandler: () => void = null
@@ -683,11 +685,12 @@ namespace FingerprintAS608 {
     export function identifyOnce(): number {
         if (pollBusy) return -4
         pollBusy = true
-        let result = -3
+        let result = -5 // image / characteristic quality failure
         if (!genImg()) {
-            result = lastErrorCode == -2 ? -2 : -3
+            // A valid ACK with code 0x02 means no finger. Do not treat it as rejection.
+            result = lastErrorCode == -2 ? -2 : (respBuf && respBuf[9] == 0x02 ? -3 : -5)
         } else if (!img2Tz(Slots.CharBuffer1)) {
-            result = lastErrorCode == -2 ? -2 : -3
+            result = lastErrorCode == -2 ? -2 : -5
         } else {
             result = search(Slots.CharBuffer1)
         }
@@ -708,38 +711,47 @@ namespace FingerprintAS608 {
     export function startAutomatic(): void {
         if (autoRunning) return
         autoRunning = true
+        let generation = ++autoGeneration
+        waitForRemoval = false
+        noFingerStreak = 0
         control.inBackground(function () {
-            while (autoRunning) {
+            while (autoRunning && generation == autoGeneration) {
                 if (input.runningTime() < lockedUntil) {
                     basic.pause(150)
                     continue
                 }
                 let result = identifyOnce()
                 if (result >= 0) {
+                    noFingerStreak = 0
                     if (!waitForRemoval) {
                         lastFingerId = result
                         successCount++
                         consecutiveRejects = 0
                         waitForRemoval = true
-                        if (recognizedHandler) recognizedHandler(result)
+                        // Do not let sound, animations or servo delays block the scanner loop.
+                        if (recognizedHandler) control.runInParallel(function () { recognizedHandler(result) })
                     }
                 } else if (result == -3) {
-                    waitForRemoval = false
+                    noFingerStreak++
+                    if (noFingerStreak >= 2) waitForRemoval = false
                 } else if (result == -9) {
+                    noFingerStreak = 0
                     if (!waitForRemoval) {
                         failureCount++
                         consecutiveRejects++
                         waitForRemoval = true
-                        if (rejectedHandler) rejectedHandler()
+                        if (rejectedHandler) control.runInParallel(function () { rejectedHandler() })
                         if (maxRejects > 0 && consecutiveRejects >= maxRejects) {
                             lockedUntil = input.runningTime() + lockDuration
                             consecutiveRejects = 0
                         }
                     }
-                } else if (result == -2) {
+                } else if (result == -2 || result == -1) {
+                    // Communication errors are NOT rejected fingerprints.
                     failureCount++
-                    if (errorHandler) errorHandler()
+                    if (errorHandler) control.runInParallel(function () { errorHandler() })
                 }
+                // -5 poor image: ignore, and do not clear finger-placement state.
                 basic.pause(150)
             }
         })
@@ -748,7 +760,10 @@ namespace FingerprintAS608 {
     /** Stop background fingerprint scanning. */
     //% blockId=as608_stop_auto block="stop automatic fingerprint scanning"
     //% weight=97
-    export function stopAutomatic(): void { autoRunning = false }
+    export function stopAutomatic(): void {
+        autoRunning = false
+        autoGeneration++
+    }
 
     /** Handler runs once per recognized finger placement; ID is available from last fingerprint ID. */
     //% blockId=as608_on_recognized block="on fingerprint recognized"
